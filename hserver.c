@@ -14,8 +14,13 @@ typedef struct client_accum
 	SOCKET socket;
 	char c[STRCT_SIZE];
 	size_t length;
-	size_t used;
 }client_accum;
+
+void client_clean(client_accum* client)
+{
+	memset(client->c,0,STRCT_SIZE); 
+	client->length = 0; 
+}
 
 int main()
 {
@@ -44,6 +49,7 @@ int main()
 	char file_buffer[BUFF_SIZE]; //to store file contents
 	char buffer[BUFF_SIZE];
 	char buff[BUFF_SIZE];
+	char* char_buff = (char*)malloc(STRCT_SIZE*sizeof(char));
 	//lens	
 	int len_sockad = sizeof(sockad);
 	//httpreq
@@ -52,7 +58,7 @@ int main()
 
 	memset(&sockad,0,sizeof(sockad));
 	sockad.sin_family = AF_INET;
-	sockad.sin_port = htons(8080);
+	sockad.sin_port = htons(8081);
 	sockad.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	lin = socket(AF_INET,SOCK_STREAM,0);
@@ -88,10 +94,8 @@ int main()
 			client_accum* temp = (client_accum*)malloc(sizeof(client_accum));
 			//memset(&(clients[i]->c),0,4096);
 			temp->socket = INVALID_SOCKET; 
-			temp->length = 0;
-			temp->used= 0; 
+			client_clean(temp); 
 			clients[i] = temp;
-			memset(&temp->c,0,4096);
 	}	
 	FD_ZERO(&sok_set_master);//removing garbage values
 	FD_SET(lin,&sok_set_master);//inserting the listening socket
@@ -99,7 +103,6 @@ int main()
 	{
 		sok_set_reg = sok_set_master;
 		int n = select(0,&sok_set_reg,NULL,NULL,NULL);
-
 		if(FD_ISSET(lin,&sok_set_reg))
 		{
 			cin = accept(lin,(struct sockaddr*)&sockad,&len_sockad);
@@ -121,39 +124,45 @@ int main()
 		}
 		for(int i = 0; i<CLI_SIZE; i++) //write an accumulator : you have to parse one byte at a time to detect \r\n\r\n
 		{
-			if(clients[i]->socket == INVALID_SOCKET) continue;
+
+			if(clients[i]->socket == INVALID_SOCKET) continue ;
 			if(FD_ISSET(clients[i]->socket,&sok_set_reg))
 			{
-			int r_in = 1;
-			while(r_in > 0) 
-				{
-					memset(&buff,0,CLI_SIZE); //buff will hold the the recieving data from the http request. it will be parsed int the struct.buffer[]
-					r_in = recv(clients[i]->socket,buff,BUFF_SIZE,0);
-					if(r_in == 0){
-						clients[i]->used = 1; 
-						break;
+				int r_in = 1;
+				while(r_in > 0) 
+					{
+						memset(&buff,0,BUFF_SIZE); //buff will hold the the recieving data from the http request. it will be parsed int the struct.buffer[]
+						r_in = recv(clients[i]->socket,buff,BUFF_SIZE,0);
+						if(r_in == 0)
+						{
+							FD_CLR(clients[i]->socket,&sok_set_master);
+							closesocket(clients[i]->socket);
+							clients[i]->socket = INVALID_SOCKET;
+							break;
+						}
+						//fputs(buff,stdout);
+						if((r_in + clients[i]->length) > STRCT_SIZE) //to catch buffers overflow
+						{
+							fputs("buffer overflow",stdout);
+							break;
+						}
+						memcpy(&clients[i]->c[clients[i]->length],buff,r_in);
+						clients[i]->length += r_in;
+						if( strstr(clients[i]->c,"\r\n\r\n"))
+						{
+							parser(Httpreq,clients[i]->c);
+							//fputs(Httpreq->method,stdout);
+							//fputs(Httpreq->path,stdout);
+							//fputs(Httpreq->version,stdout);
+							char_buff = doc_prep(Httpreq->path);
+							fputs(char_buff,stdout);
+							int s_chk =send(clients[i]->socket,char_buff,strlen(char_buff),0);
+						}		
 					}
-					fputs(buff,stdout);
-					memcpy(&clients[i]->c[clients[i]->length],buff,BUFF_SIZE);
-					clients[i]->length += strlen(buff);
-				}
-
-				//fputs(clients[i]->c,stdout); 
-				if(clients[i]->used == 0)
-				{
-					FD_CLR(clients[i]->socket,&sok_set_master);
-					closesocket(clients[i]->socket);
-					clients[i]->socket = INVALID_SOCKET;
-					continue;
-				}
-
-				//buff[(int)strlen(buff)] = '\0';
-				//parser(Httpreq,clients[i]->c);
-				//printf("\n-------%d-------\n",(int)strlen(clients[i]->c));	
-				//fputs(Httpreq->method,stdout);
-				//fputs(Httpreq->path,stdout);
-				//fputs(Httpreq->version,stdout);
-				//send(clients[i]->socket,buffer,strlen(buffer)+1,0);
+					//fputs("loop ended");
+					//fputs(clients[i]->c,stdout);
+					//send(clients[i]->socket,buffer,strlen(buffer)+1,0);
+					client_clean(clients[i]);  //cleaning the buffer so its reusabui when selected again
 			}
 		}
 	}

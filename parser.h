@@ -8,5 +8,6 @@ typedef struct {
 }httpreq;
 
 int parser(httpreq* HttpRequest, const char* buffer);
+char* doc_prep(const char* path);
 #endif
 
