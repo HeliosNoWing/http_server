@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "doc_prep.h" 
 #include<stdio.h>
 #include<stdlib.h>
 #include<winsock2.h>
@@ -140,7 +141,6 @@ int main()
 							clients[i]->socket = INVALID_SOCKET;
 							break;
 						}
-						//fputs(buff,stdout);
 						if((r_in + clients[i]->length) > STRCT_SIZE) //to catch buffers overflow
 						{
 							fputs("buffer overflow",stdout);
@@ -148,7 +148,7 @@ int main()
 						}
 						memcpy(&clients[i]->c[clients[i]->length],buff,r_in);
 						clients[i]->length += r_in;
-						if( strstr(clients[i]->c,"\r\n\r\n"))
+						if(strstr(clients[i]->c,"\r\n\r\n"))
 						{
 							parser(Httpreq,clients[i]->c);
 							//fputs(Httpreq->method,stdout);
