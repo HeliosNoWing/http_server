@@ -49,8 +49,8 @@ int main()
 	char file_buffer[BUFF_SIZE]; //to store file contents
 	char buffer[BUFF_SIZE];
 	char buff[BUFF_SIZE];
-	char* char_buff = (char*)malloc(STRCT_SIZE*sizeof(char));
-	//lens	
+	char* HTML_FILE_BUFFER = (char*)malloc(STRCT_SIZE*sizeof(char));
+	//lens	i
 	int len_sockad = sizeof(sockad);
 	//httpreq
 	httpreq* Httpreq = (httpreq*)malloc(sizeof(httpreq));
@@ -154,9 +154,8 @@ int main()
 							//fputs(Httpreq->method,stdout);
 							//fputs(Httpreq->path,stdout);
 							//fputs(Httpreq->version,stdout);
-							char_buff = doc_prep(Httpreq->path);
-							fputs(char_buff,stdout);
-							int s_chk =send(clients[i]->socket,char_buff,strlen(char_buff),0);
+							HTML_FILE_BUFFER = doc_prep(Httpreq->path);	
+							//int s_chk =send(clients[i]->socket,char_buff,strlen(char_buff),0);
 						}		
 					}
 					//fputs("loop ended");
