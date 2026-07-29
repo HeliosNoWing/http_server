@@ -1,9 +1,9 @@
 #include "parser.h"
-#include "doc_prep.h" 
+#include "doc_prep.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<winsock2.h>
-#include<ws2tcpip.h> //fix the mem leack use const  char [] , fix character lenght,
+#include<ws2tcpip.h> 
 #include<windows.h>
 
 #define STRCT_SIZE 4096
@@ -148,13 +148,20 @@ int main()
 						}
 						memcpy(&clients[i]->c[clients[i]->length],buff,r_in);
 						clients[i]->length += r_in;
-						if(strstr(clients[i]->c,"\r\n\r\n"))
+						if(strstr(clients[i]->c,"\r\n\r\n"))// change this later for f**K sake (censored for github)
 						{
+							buffer[strlen(buffer)+1] = '\0';
 							parser(Httpreq,clients[i]->c);
 							//fputs(Httpreq->method,stdout);
-							//fputs(Httpreq->path,stdout);
+							//fprintfputs(Httpreq->path,stdout);
 							//fputs(Httpreq->version,stdout);
-							HTML_FILE_BUFFER = doc_prep(Httpreq->path);	
+							int prep_chk = doc_prep(Httpreq->path,HTML_FILE_BUFFER);
+							if(prep_chk == FILE_NOT_FOUND) 
+							{
+								fputs("NO_FILE",stdout);
+								continue;
+							}
+							fputs(HTML_FILE_BUFFER,stdout);
 							//int s_chk =send(clients[i]->socket,char_buff,strlen(char_buff),0);
 						}		
 					}
