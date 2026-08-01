@@ -5,6 +5,7 @@
 #include<winsock2.h>
 #include<ws2tcpip.h> 
 #include<windows.h>
+#include<stddef.h>
 
 #define STRCT_SIZE 4096
 #define CLI_SIZE 64
@@ -50,7 +51,7 @@ int main()
 	char file_buffer[BUFF_SIZE]; //to store file contents
 	char buffer[BUFF_SIZE];
 	char buff[BUFF_SIZE];
-	char* HTML_FILE_BUFFER = (char*)malloc(STRCT_SIZE*sizeof(char));
+	char HTML_FILE_BUFFER[STRCT_SIZE];
 	//lens	i
 	int len_sockad = sizeof(sockad);
 	//httpreq
@@ -152,16 +153,15 @@ int main()
 						{
 							buffer[strlen(buffer)+1] = '\0';
 							parser(Httpreq,clients[i]->c);
-							//fputs(Httpreq->method,stdout);
-							//fprintfputs(Httpreq->path,stdout);
-							//fputs(Httpreq->version,stdout);
-							int prep_chk = doc_prep(Httpreq->path,HTML_FILE_BUFFER);
-							if(prep_chk == FILE_NOT_FOUND) 
+							size_t content_length = doc_prep(Httpreq->path,HTML_FILE_BUFFER);
+							if(content_length == FILE_NOT_FOUND) 
 							{
 								fputs("NO_FILE",stdout);
 								continue;
 							}
-							fputs(HTML_FILE_BUFFER,stdout);
+							//printf("\ncontent_length: %zu\n",content_length);
+							//fputs(clients[i]->c,stdout);
+							//fputs(HTML_FILE_BUFFER,stdout);
 							//int s_chk =send(clients[i]->socket,char_buff,strlen(char_buff),0);
 						}		
 					}
