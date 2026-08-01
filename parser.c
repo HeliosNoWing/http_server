@@ -8,15 +8,10 @@ int parser(httpreq* HttpRequest,const char* buffer)
 {
 	char temp[255]; 
 	char temp2[255];
-	sscanf(buffer,"%15s %255s %15s %1024s",HttpRequest->method,HttpRequest->path,HttpRequest->version,temp);
-	//fputs(HttpRequest->method,stdout);
-	//fputs(HttpRequest->path,stdout);
-	//fputs(HttpRequest->version,stdout);
-	//fputs(temp,stdout);
+	sscanf(buffer,"%15s %255s %15s",HttpRequest->method,HttpRequest->path,HttpRequest->version,temp);
 	char* ptr = strstr(buffer,"Accept");
-	sscanf(ptr,"%30[^:]s %254[^/r/n]s",temp,temp2);
-	fputs(temp,stdout); 
-	fputs(temp2,stdout);
+	sscanf(ptr,"%*[^:]:%254[^\r\n]",HttpRequest->content_type);
+	fputs(HttpRequest->content_type,stdout);
 	return 0;
 }
 
