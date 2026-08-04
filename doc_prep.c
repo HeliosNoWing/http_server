@@ -3,14 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#define PATH_SIZE 256
+#define MAX_PATH_SIZE 256
 
 size_t doc_prep(const char* path, char* file_buffer)
 {
 	FILE* ptr;
-	char complete_path[PATH_SIZE];
-	char* temp_char_buffer = (char*)malloc(sizeof(char)*PATH_SIZE);
-	char* jky = file_buffer;
+	char complete_path[MAX_PATH_SIZE];
 	if(strlen(path) == 1){
 		sprintf(complete_path,"%s","index.html"); 
 	}
@@ -23,8 +21,7 @@ size_t doc_prep(const char* path, char* file_buffer)
 		fputs("couldnt find",stdout);
 		return FILE_NOT_FOUND;
 	}
-	size_t n = fread(temp_char_buffer,1,100,ptr);
-	memcpy(file_buffer,temp_char_buffer,n);
+	size_t n = fread(file_buffer,1,100,ptr);
 	fclose(ptr);
 	return n;
 }

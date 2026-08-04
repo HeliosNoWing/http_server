@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "doc_prep.h"
+#include "mime_chk.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<winsock2.h>
@@ -159,6 +160,7 @@ int main()
 								fputs("NO_FILE",stdout);
 								continue;
 							}
+							fputs(mime_extract(Httpreq->path),stdout);
 							//printf("\ncontent_length: %zu\n",content_length);
 							//fputs(clients[i]->c,stdout);
 							//fputs(HTML_FILE_BUFFER,stdout);
