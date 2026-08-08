@@ -160,7 +160,9 @@ int main()
 								fputs("NO_FILE",stdout);
 								continue;
 							}
-							fputs(mime_extract(Httpreq->path),stdout);
+							
+							char* mime = mime_extract("/content/html/dummy.html");
+							fputs(mime_lookup(mime),stdout);
 							//printf("\ncontent_length: %zu\n",content_length);
 							//fputs(clients[i]->c,stdout);
 							//fputs(HTML_FILE_BUFFER,stdout);
