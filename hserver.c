@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "response_build.h"
 #include "doc_prep.h"
 #include "mime_chk.h"
 #include<stdio.h>
@@ -53,6 +54,7 @@ int main()
 	char buffer[BUFF_SIZE];
 	char buff[BUFF_SIZE];
 	char HTML_FILE_BUFFER[STRCT_SIZE];
+	char char_buff[STRCT_SIZE];
 	//lens	i
 	int len_sockad = sizeof(sockad);
 	//httpreq
@@ -136,6 +138,7 @@ int main()
 					{
 						memset(&buff,0,BUFF_SIZE); //buff will hold the the recieving data from the http request. it will be parsed int the struct.buffer[]
 						r_in = recv(clients[i]->socket,buff,BUFF_SIZE,0);
+						fputs(clients[i]->c,stdout);
 						if(r_in == 0)
 						{
 							FD_CLR(clients[i]->socket,&sok_set_master);
@@ -161,12 +164,15 @@ int main()
 								continue;
 							}
 							
-							char* mime = mime_extract("/content/html/dummy.html");
-							fputs(mime_lookup(mime),stdout);
+							char* mime = mime_extract(Httpreq->path);
+							char* response_mime = mime_lookup(mime);
+							memset(&char_buff,0,sizeof(char_buff));
+							response_builder(char_buff,Httpreq,response_mime,content_length,HTML_FILE_BUFFER);
+							//fputs(response_mime,stdout);
 							//printf("\ncontent_length: %zu\n",content_length);
-							//fputs(clients[i]->c,stdout);
 							//fputs(HTML_FILE_BUFFER,stdout);
-							//int s_chk =send(clients[i]->socket,char_buff,strlen(char_buff),0);
+							fputs(char_buff,stdout);
+							int s_chk = send(clients[i]->socket,char_buff,strlen(char_buff),0);
 						}		
 					}
 					//fputs("loop ended");
