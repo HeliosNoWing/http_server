@@ -138,7 +138,6 @@ int main()
 					{
 						memset(&buff,0,BUFF_SIZE); //buff will hold the the recieving data from the http request. it will be parsed int the struct.buffer[]
 						r_in = recv(clients[i]->socket,buff,BUFF_SIZE,0);
-						fputs(clients[i]->c,stdout);
 						if(r_in == 0)
 						{
 							FD_CLR(clients[i]->socket,&sok_set_master);
@@ -155,24 +154,22 @@ int main()
 						clients[i]->length += r_in;
 						if(strstr(clients[i]->c,"\r\n\r\n"))// change this later for f**K sake (censored for github)
 						{
-							buffer[strlen(buffer)+1] = '\0';
 							parser(Httpreq,clients[i]->c);
 							size_t content_length = doc_prep(Httpreq->path,HTML_FILE_BUFFER);
-							if(content_length == FILE_NOT_FOUND) 
-							{
-								fputs("NO_FILE",stdout);
-								continue;
-							}
-							
+
 							char* mime = mime_extract(Httpreq->path);
 							char* response_mime = mime_lookup(mime);
+
 							memset(&char_buff,0,sizeof(char_buff));
-							response_builder(char_buff,Httpreq,response_mime,content_length,HTML_FILE_BUFFER);
+							int header_length = response_builder(char_buff,Httpreq,response_mime,content_length,HTML_FILE_BUFFER);
+
 							//fputs(response_mime,stdout);
-							//printf("\ncontent_length: %zu\n",content_length);
+							printf("\ncontent_length: %zu\n",content_length);
 							//fputs(HTML_FILE_BUFFER,stdout);
 							fputs(char_buff,stdout);
-							int s_chk = send(clients[i]->socket,char_buff,strlen(char_buff),0);
+							fputs(HTML_FILE_BUFFER,stdout);
+							int s_chk = send(clients[i]->socket,char_buff,header_length,0);
+							s_chk = send(clients[i]->socket,HTML_FILE_BUFFER,content_length,0);
 						}		
 					}
 					//fputs("loop ended");

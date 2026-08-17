@@ -8,6 +8,7 @@
 size_t doc_prep(const char* path, char* file_buffer)
 {
 	FILE* ptr;
+	char* jky = file_buffer;
 	char complete_path[MAX_PATH_SIZE];
 	if(strlen(path) == 1){
 		sprintf(complete_path,"%s","index.html"); 
@@ -16,12 +17,18 @@ size_t doc_prep(const char* path, char* file_buffer)
 		sprintf(complete_path,"%s",path); // complete_path = /index.html
  	}
 	//fputs(complete_path,stdout); 
-	ptr = fopen(complete_path,"r");
+	ptr = fopen(complete_path,"rb");
 	if(!ptr){
 		fputs("couldnt find",stdout);
 		return FILE_NOT_FOUND;
 	}
-	size_t n = fread(file_buffer,1,100,ptr);
+	size_t n = 0;
+	size_t temp = 0;
+	do{
+		temp = fread(jky,1,100,ptr);
+		jky+=temp;
+		n+=temp;
+	}while(temp);
 	fclose(ptr);
 	return n;
 }
