@@ -35,7 +35,7 @@ char* mime_extract(char* file_path)
 char* mime_lookup(char* mime)
 {
 	look_up* look_up_table = table_init();
-	int i  = 0; 
+	int i  = 0;
 	int j = NUM_ENTRY-1;
 	while(i<=j)
 	{

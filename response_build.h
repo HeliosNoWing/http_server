@@ -2,6 +2,6 @@
 #define RESP_B_H
 #include <stddef.h>
 #include "parser.h"
-int response_builder(char response[],httpreq* http_requests,char* mime,size_t content_length,char* payload);
-void payload_process();
+#include "doc_prep.h"
+int response_builder(char response[],httpreq* http_requests,char* mime,payload* resp);
 #endif

@@ -59,7 +59,11 @@ int main()
 	int len_sockad = sizeof(sockad);
 	//httpreq
 	httpreq* Httpreq = (httpreq*)malloc(sizeof(httpreq));
-	
+	//payload
+	payload* resp = (payload*)malloc(sizeof(payload));
+	resp->file_buffer = HTML_FILE_BUFFER;
+	resp->response_code = INT_MIN;
+	resp->content_length = 0;
 
 	memset(&sockad,0,sizeof(sockad));
 	sockad.sin_family = AF_INET;
@@ -145,7 +149,7 @@ int main()
 							clients[i]->socket = INVALID_SOCKET;
 							break;
 						}
-						if((r_in + clients[i]->length) > STRCT_SIZE) //to catch buffers overflow
+							if((r_in + clients[i]->length) > STRCT_SIZE) //to catch buffers overflow
 						{
 							fputs("buffer overflow",stdout);
 							break;
@@ -155,21 +159,20 @@ int main()
 						if(strstr(clients[i]->c,"\r\n\r\n"))// change this later for f**K sake (censored for github)
 						{
 							parser(Httpreq,clients[i]->c);
-							size_t content_length = doc_prep(Httpreq->path,HTML_FILE_BUFFER);
-
+							doc_prep(Httpreq,resp);
 							char* mime = mime_extract(Httpreq->path);
 							char* response_mime = mime_lookup(mime);
 
 							memset(&char_buff,0,sizeof(char_buff));
-							int header_length = response_builder(char_buff,Httpreq,response_mime,content_length,HTML_FILE_BUFFER);
+							int header_length = response_builder(char_buff,Httpreq,response_mime,resp);
 
 							//fputs(response_mime,stdout);
-							printf("\ncontent_length: %zu\n",content_length);
+							printf("\ncontent_length: %zu\n",resp->content_length);
 							//fputs(HTML_FILE_BUFFER,stdout);
-							fputs(char_buff,stdout);
-							fputs(HTML_FILE_BUFFER,stdout);
+							//fputs(char_buff,stdout);
+							//fputs(HTML_FILE_BUFFER,stdout);
 							int s_chk = send(clients[i]->socket,char_buff,header_length,0);
-							s_chk = send(clients[i]->socket,HTML_FILE_BUFFER,content_length,0);
+							s_chk = send(clients[i]->socket,HTML_FILE_BUFFER,resp->content_length,0);
 						}		
 					}
 					//fputs("loop ended");
