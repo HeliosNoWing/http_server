@@ -7,6 +7,7 @@
 #define REQ_NOT_ALLOWED -3
 #define INVALID_REQ -2
 #define FILE_NOT_FOUND -1
+#define FILE_FOUND -44
 void doc_prep(httpreq* request,payload* resp)
 {
 	FILE* ptr;
@@ -17,6 +18,7 @@ void doc_prep(httpreq* request,payload* resp)
 	if(strlen(request->path) == 1)
 	{
 		sprintf(complete_path,"%s","index.html");
+		resp->response_code = FILE_FOUND;
 	}
 	else
 	{

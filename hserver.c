@@ -161,18 +161,15 @@ int main()
 							parser(Httpreq,clients[i]->c);
 							doc_prep(Httpreq,resp);
 							char* mime = mime_extract(Httpreq->path);
-							char* response_mime = mime_lookup(mime);
-
+							char* mime_meth = mime_lookup(mime);
 							memset(&char_buff,0,sizeof(char_buff));
-							int header_length = response_builder(char_buff,Httpreq,response_mime,resp);
+							int header_length = response_builder(char_buff,Httpreq,mime_meth,resp);
 
-							//fputs(response_mime,stdout);
-							printf("\ncontent_length: %zu\n",resp->content_length);
-							//fputs(HTML_FILE_BUFFER,stdout);
-							//fputs(char_buff,stdout);
-							//fputs(HTML_FILE_BUFFER,stdout);
+							//printf("\ncontent_length: %zu : %s\n",resp->content_length,resp->file_buffer);
+
 							int s_chk = send(clients[i]->socket,char_buff,header_length,0);
-							s_chk = send(clients[i]->socket,HTML_FILE_BUFFER,resp->content_length,0);
+							//fputs(char_buff,stdout);
+							s_chk = send(clients[i]->socket,resp->file_buffer,resp->content_length,0);
 						}		
 					}
 					//fputs("loop ended");

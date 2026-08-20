@@ -3,6 +3,7 @@
 #define FILE_NOT_FOUND -1
 #define INVALID_REQ -2
 #define REQ_NOT_ALLOWED -3
+#define FILE_FOUND -44
 #include <stddef.h>
 #include "parser.h"
 typedef struct payload{

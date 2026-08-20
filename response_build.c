@@ -7,8 +7,11 @@ int response_builder(char response[],httpreq* http_requests,char* mime,payload* 
 {
 	int header_length;
 	int resp_code = resp->response_code;
+	printf("%d",resp_code);
 	switch(resp_code)
 	{
+		case FILE_FOUND:
+			break;
 		case FILE_NOT_FOUND:
 			header_length = sprintf(response,"HTTP/1.1 404 NOT FOUND");
 			return header_length;
