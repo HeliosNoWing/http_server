@@ -7,24 +7,26 @@ int response_builder(char response[],httpreq* http_requests,char* mime,payload* 
 {
 	int header_length;
 	int resp_code = resp->response_code;
+	char temp[100];
 	printf("%d",resp_code);
 	switch(resp_code)
 	{
 		case FILE_FOUND:
+			sprintf(temp,"HTTP/1.1 200 OK");
 			break;
 		case FILE_NOT_FOUND:
-			header_length = sprintf(response,"HTTP/1.1 404 NOT FOUND");
-			return header_length;
+			sprintf(temp,"HTTP/1.1 404 NOT FOUND");
+			break;
 		case INVALID_REQ:
-			header_length = sprintf(response,"HTTP/1.1 400 BAD REQUEST");
-			return header_length;
+			sprintf(temp,"HTTP/1.1 400 BAD REQUEST");
+			break;
 		case REQ_NOT_ALLOWED:
-			header_length = sprintf(response,"HTTP/1.1 405 NOT ALLOWED");
-		 	return header_length;
+			sprintf(temp,"HTTP/1.1 405 NOT ALLOWED");
+		 	break;
 		default:
-			header_length = sprintf(response,"HTTP/1.1 500 INTERNAL SERVER ERROR");
-			return header_length;
+			sprintf(temp,"HTTP/1.1 500 INTERNAL SERVER ERROR");
+			break;
 	}
-	header_length = sprintf(response,"%s 200 OK\r\nContent-Type: %s\r\nContent-Length: %zu\r\n\r\n",http_requests->version,mime,resp->content_length);
+	header_length = sprintf(response,"%s\r\nContent-Type: %s\r\nContent-Length: %zu\r\n\r\n",temp,mime,resp->content_length);
 	return header_length;
 }

@@ -101,7 +101,6 @@ int main()
 	for(int i = 0; i<CLI_SIZE; i++) 
 	{
 			client_accum* temp = (client_accum*)malloc(sizeof(client_accum));
-			//memset(&(clients[i]->c),0,4096);
 			temp->socket = INVALID_SOCKET; 
 			client_clean(temp); 
 			clients[i] = temp;
@@ -165,16 +164,11 @@ int main()
 							memset(&char_buff,0,sizeof(char_buff));
 							int header_length = response_builder(char_buff,Httpreq,mime_meth,resp);
 
-							//printf("\ncontent_length: %zu : %s\n",resp->content_length,resp->file_buffer);
-
 							int s_chk = send(clients[i]->socket,char_buff,header_length,0);
 							//fputs(char_buff,stdout);
 							s_chk = send(clients[i]->socket,resp->file_buffer,resp->content_length,0);
 						}		
 					}
-					//fputs("loop ended");
-					//fputs(clients[i]->c,stdout);
-					//send(clients[i]->socket,buffer,strlen(buffer)+1,0);
 					client_clean(clients[i]);  //cleaning the buffer so its reusabui when selected again
 			}
 		}
